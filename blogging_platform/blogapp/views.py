@@ -98,7 +98,7 @@ class BlogDetailView(generics.RetrieveUpdateDestroyAPIView):
             return Response({"message": "Blog not found."})  
 
 
-#..........................BLOGPOST CREATE..................................#
+#..........................COMMENT CREATE..................................#
 
 class CommentCreateView(generics.CreateAPIView):
 

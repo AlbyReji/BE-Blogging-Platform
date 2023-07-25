@@ -61,7 +61,6 @@ class AdminRegisterSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     
     user = serializers.ReadOnlyField(source='user.username')
-    # blog_post = serializers.StringRelatedField()
 
     class Meta:
         model = Comment

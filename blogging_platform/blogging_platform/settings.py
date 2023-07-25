@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
+import os
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'blogapp',
     'rest_framework',
-
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -79,7 +82,7 @@ WSGI_APPLICATION = 'blogging_platform.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'blogdb',
+        'NAME': 'blogsdb',
         'USER':'root',
         'PASSWORD': 'alby1234',
         'HOST':'localhost',
@@ -124,7 +127,35 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+
+MEDIA_ROOT = os.path.join(BASE_DIR,'uploads/')
+MEDIA_URL = '/media/'
+
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_HOST_USER = '54bce3c59a90da'
+EMAIL_HOST_PASSWORD = '94580cfd6d44ab'
+EMAIL_PORT = '2525'
+
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+AUTH_USER_MODEL = 'blogapp.User'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=20),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}

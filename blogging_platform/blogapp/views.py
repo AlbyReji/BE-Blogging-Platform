@@ -3,7 +3,8 @@ from django.shortcuts import render,redirect
 from .serializers import (UserRegisterSerializer,
                           AdminRegisterSerializer,
                           BlogPostSerializer,
-                          CommentSerializer)
+                          CommentSerializer,
+                          AdminBlogPostSerializer)
 
 from .models import (User,
                     BlogPost,
@@ -113,8 +114,46 @@ class CommentCreateView(generics.CreateAPIView):
         serializer.save(user=self.request.user, blog_post_id=blog_post_id)
 
 
+#..........................VIEW ALL COMMENTS..................................#
+
+class CommentListView(generics.ListAPIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
 
 
+    def get_queryset(self):
+        blog_post_id = self.kwargs['blog_post_id']
+        return Comment.objects.filter(blog_post_id=blog_post_id)
+
+
+#..........................EDIT OR DELETE COMMENTS..................................#
+
+class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+    def put(self, request, *args, **kwargs):
+            instance = self.get_object()
+            if instance.user != self.request.user:
+                raise PermissionDenied("You do not have permission to edit this comment.")
+            return self.update(request, *args, **kwargs) 
+
+    def delete(self, request, *args, **kwargs): 
+            instance = self.get_object()
+            if instance.user != self.request.user:
+                raise PermissionDenied("You do not have permission to delete this comment.")
+            self.perform_destroy(instance) 
+            return Response({"message": "Comment deleted successfully."})
 
 
 
@@ -139,3 +178,61 @@ class AdminRegisterView(APIView):
         else:
             data = serializer.errors
         return Response(data)
+
+#..........................ADMIN VIEW ALL BLOGS..................................#
+
+class AdminBlogListView(generics.ListAPIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
+    queryset = BlogPost.objects.all()
+    serializer_class = AdminBlogPostSerializer
+
+
+#..........................ADMIN DELETE BLOGS..................................#
+
+
+class AdminBlogDetailView(generics.DestroyAPIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
+    queryset = BlogPost.objects.all()
+    serializer_class = AdminBlogPostSerializer
+
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return Response({"message": "Blog deleted successfully."})
+        except NotFound:
+            return Response({"message": "Blog not found."})  
+
+#..........................ADMIN VIEW ALL COMMENTS..................................#
+
+class AdminCommentView(generics.ListAPIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+
+#..........................ADMIN DELETE BLOGS..................................#
+
+
+class AdminCommentDetailView(generics.DestroyAPIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return Response({"message": "Comment deleted successfully."})
+        except NotFound:
+            return Response({"message": "Comment not found."})  

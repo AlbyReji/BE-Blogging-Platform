@@ -15,6 +15,16 @@ urlpatterns = [
     path('blogdetail/<int:pk>/',views.BlogDetailView.as_view(),name = "blogdetail"),
 
     path('commentcreate/<int:blog_post_id>/',views.CommentCreateView.as_view(),name = "commentcreate"),
+    path('commentlist/<int:blog_post_id>/', views.CommentListView.as_view(), name='list_comments_by_blog_post'),
+    path('commentdetail/<int:pk>/',views.CommentDetailView.as_view(),name = "commentdetail"),
+
 
     path('adminregister/',views.AdminRegisterView.as_view(),name = "adminregister"),
+    path('adminlist/',views.AdminBlogListView.as_view(),name = "adminlist"),
+    path('admindetail/<int:pk>/',views.AdminBlogDetailView.as_view(),name = "admindetail"),
+    path('admin_commentlist/',views.AdminCommentView.as_view(),name = "admin_commentlist"),
+    path('admin_commentdetail/<int:pk>/',views.AdminCommentDetailView.as_view(),name = "admindetail"),
+
+
+
 ]

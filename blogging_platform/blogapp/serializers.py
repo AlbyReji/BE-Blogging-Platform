@@ -66,6 +66,8 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['id', 'user', 'blog_comment', 'created_time', 'updated_time']
 
+    
+
 class BlogPostSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
     comments = CommentSerializer(many=True, read_only=True)
@@ -75,4 +77,13 @@ class BlogPostSerializer(serializers.ModelSerializer):
         model = BlogPost
         fields = ['id','author','blog_title','blog_content','created_time','updated_time','image','comments']
 
+
+
+class AdminBlogPostSerializer(serializers.ModelSerializer):
+
+    author = serializers.ReadOnlyField(source='author.username')
+
+    class Meta:
+        model = BlogPost
+        fields = ['id','author','blog_title','blog_content','created_time','updated_time','image']
 

@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'blogging_platform.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'blogsdb',
+        'NAME': 'blogdbs',
         'USER':'root',
         'PASSWORD': 'alby1234',
         'HOST':'localhost',
@@ -142,6 +142,11 @@ EMAIL_PORT = '2525'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'jwt_app.pagination.NumberPagination',
+    'PAGE_SIZE':5,
+}
 
 
 AUTH_USER_MODEL = 'blogapp.User'

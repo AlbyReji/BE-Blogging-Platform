@@ -23,6 +23,9 @@ from django.core.mail import send_mail
 from django.conf import settings
 from blogging_platform.settings import EMAIL_HOST_USER 
 
+from .pagination import NumberPagination
+
+
 
 
 #.........................................................USER SECTION.........................................................#
@@ -40,7 +43,7 @@ class RegisterView(APIView):
             account = serializer.save()
 
             send_mail(
-                subject= 'user Registration',
+                subject= 'User Registration',
                 message= 'Account is created ,Please login',
                 from_email=settings.EMAIL_HOST_USER,
                 recipient_list= [account.email] 
@@ -52,15 +55,6 @@ class RegisterView(APIView):
             data = serializer.errors
         return Response(data)
 
-
-#..........................LIST ALL BLOGPOST..................................#
-
-class BlogListView(generics.ListAPIView):
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-    queryset = BlogPost.objects.all()
-    serializer_class = BlogPostSerializer
 
 
 #..........................BLOGPOST CREATE..................................#
@@ -74,6 +68,17 @@ class BlogCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+        
+
+#..........................LIST ALL BLOGPOST..................................#
+
+class BlogListView(generics.ListAPIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = BlogPost.objects.all()
+    serializer_class = BlogPostSerializer
+    pagination_class = NumberPagination
 
 #..........................BLOGPOST RETRIEVE, UPDATE AND DELETE ..................................#
 
@@ -122,6 +127,7 @@ class CommentListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    pagination_class = NumberPagination
 
 
     def get_queryset(self):
@@ -187,6 +193,7 @@ class AdminBlogListView(generics.ListAPIView):
     permission_classes = [IsAdminUser]
     queryset = BlogPost.objects.all()
     serializer_class = AdminBlogPostSerializer
+    pagination_class = NumberPagination
 
 
 #..........................ADMIN DELETE BLOGS..................................#
@@ -216,6 +223,7 @@ class AdminCommentView(generics.ListAPIView):
     permission_classes = [IsAdminUser]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    pagination_class = NumberPagination
 
 
 #..........................ADMIN DELETE BLOGS..................................#

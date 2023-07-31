@@ -21,8 +21,6 @@ class BlogPost(models.Model):
         return self.blog_title
 
 
-
-
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     blog_post = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name='comments')

@@ -21,7 +21,10 @@ from rest_framework.permissions import IsAuthenticated,IsAdminUser
 
 from django.core.mail import send_mail
 from django.conf import settings
-from blogging_platform.settings import EMAIL_HOST_USER 
+from blogging_platform.settings import EMAIL_HOST_USER
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags 
 
 from .pagination import NumberPagination
 
@@ -40,15 +43,19 @@ class RegisterView(APIView):
         serializer = UserRegisterSerializer(data=request.data)
         data = {}
         if serializer.is_valid():
-            account = serializer.save()
+            account = serializer.save() 
+            
+            subject = 'User Registration'
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [account.email]
 
-            send_mail(
-                subject= 'User Registration',
-                message= 'Account is created ,Please login',
-                from_email=settings.EMAIL_HOST_USER,
-                recipient_list= [account.email] 
-                )    
-                
+            html_content = render_to_string('email.html', {'username': account.username})
+            text_content = strip_tags(html_content)
+
+            email = EmailMultiAlternatives(subject, text_content, from_email, recipient_list)
+            email.attach_alternative(html_content, "text/html")
+            email.send()
+
             data['response'] = 'message:User created'
             refresh = RefreshToken.for_user(account)
         else:

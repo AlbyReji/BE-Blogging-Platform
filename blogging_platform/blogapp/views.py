@@ -74,8 +74,28 @@ class BlogCreateView(generics.CreateAPIView):
     serializer_class = BlogPostSerializer
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        blog_post = serializer.save(author=self.request.user)
+
+        subject = 'Blog Post Creation'
+        from_email = settings.EMAIL_HOST_USER
+        recipient_list = [self.request.user.email]
+
+        context = {
+            'title': blog_post.blog_title,
+            'content': blog_post.blog_content,
+        }
         
+        html_content = render_to_string('blogcreate.html', context)
+        text_content = strip_tags(html_content)
+
+        email = EmailMultiAlternatives(subject, text_content, from_email, recipient_list)
+        email.attach_alternative(html_content, "text/html")
+
+        if blog_post.image:
+            email.attach(blog_post.image.name, blog_post.image.read())
+
+        email.send()
+
 
 #..........................LIST ALL BLOGPOST..................................#
 
